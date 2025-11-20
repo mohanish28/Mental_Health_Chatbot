@@ -12,6 +12,7 @@ from datasets import load_dataset
 import random
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from spellchecker import SpellChecker
 
 # Download VADER lexicon if not present
 try:
@@ -404,6 +405,20 @@ def get_sentiment(text):
     sentiment = sia.polarity_scores(text)
     return sentiment['compound']
 
+def correct_sentence(text):
+    """Correct misspelled words in a sentence"""
+    spell = SpellChecker()
+    words = text.split()
+    corrected_words = []
+    
+    for word in words:
+        # Get the one `most likely` answer
+        corrected = spell.correction(word)
+        # If correction returns None (rare), keep original
+        corrected_words.append(corrected if corrected else word)
+        
+    return " ".join(corrected_words)
+
 def get_best_response(user_input, dataset):
     """Advanced matching with personalization, sentiment analysis, and context awareness"""
     if not user_input:
@@ -430,7 +445,14 @@ def get_best_response(user_input, dataset):
         st.session_state.history = []
     st.session_state.history.append(user_input)
     
-    user_input_lower = user_input.lower().strip()
+    # Spell Correction
+    user_input_corrected = correct_sentence(user_input)
+    if user_input_corrected != user_input:
+        # Optional: Show corrected text for transparency (or just use it silently)
+        # st.caption(f"Did you mean: {user_input_corrected}?")
+        pass
+        
+    user_input_lower = user_input_corrected.lower().strip()
     user_words = [w for w in user_input_lower.split() if len(w) > 1]
     user_words_set = set(user_words)
     

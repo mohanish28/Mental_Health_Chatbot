@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+fuzzywuzzy
+python-Levenshtein
+SpeechRecognition
+pyttsx3
+nltk
+datasets
+scikit-learn
+pyspellchecker
